@@ -1,3 +1,4 @@
+// Interview generation page: allows user to generate a new interview
 import Agent from "@/components/Agent";
 import { getCurrentUser } from "@/lib/actions/auth.action";
 

@@ -1,3 +1,4 @@
+// Interview details page: shows interview info and allows taking the interview
 import Image from "next/image";
 import { redirect } from "next/navigation";
 

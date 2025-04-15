@@ -1,3 +1,4 @@
+// Auth layout: wraps authentication pages and redirects if already logged in
 import { ReactNode } from "react";
 import { redirect } from "next/navigation";
 

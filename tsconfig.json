@@ -1,3 +1,5 @@
+// This file configures TypeScript compiler options for the project
+// It sets strictness, module resolution, path aliases, and includes/excludes
 {
   "compilerOptions": {
     "forceConsistentCasingInFileNames": true,

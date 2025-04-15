@@ -1,3 +1,4 @@
+// Home page: dashboard showing user's interviews and available interviews
 import Link from "next/link";
 import Image from "next/image";
 

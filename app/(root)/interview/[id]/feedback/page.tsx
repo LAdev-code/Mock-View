@@ -1,3 +1,4 @@
+// Interview feedback page: displays feedback and scores for a completed interview
 import dayjs from "dayjs";
 import Link from "next/link";
 import Image from "next/image";

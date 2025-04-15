@@ -1,3 +1,4 @@
+// ESLint configuration for code linting and style enforcement
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";

@@ -1,15 +1,23 @@
-"use server";
+"use server"; // Mark this file as server-side only code
+
+// Server actions for general interview and feedback logic
 
 import { generateObject } from "ai";
 import { google } from "@ai-sdk/google";
-
 import { db } from "@/firebase/admin";
 import { feedbackSchema } from "@/constants";
 
+/**
+ * Creates or updates interview feedback using AI analysis
+ * @param params Object containing interview data (interviewId, userId, transcript, feedbackId)
+ * @returns Success status and feedback ID
+ */
 export async function createFeedback(params: CreateFeedbackParams) {
   const { interviewId, userId, transcript, feedbackId } = params;
 
   try {
+    // Format transcript for AI processing
+    // Converts array of messages into a formatted string
     const formattedTranscript = transcript
       .map(
         (sentence: { role: string; content: string }) =>
@@ -17,6 +25,7 @@ export async function createFeedback(params: CreateFeedbackParams) {
       )
       .join("");
 
+    // Generate AI feedback using Google's Gemini model
     const { object } = await generateObject({
       model: google("gemini-2.0-flash-001", {
         structuredOutputs: false,
@@ -38,6 +47,7 @@ export async function createFeedback(params: CreateFeedbackParams) {
         "You are a professional interviewer analyzing a mock interview. Your task is to evaluate the candidate based on structured categories",
     });
 
+    // Prepare feedback document with AI analysis and metadata
     const feedback = {
       interviewId: interviewId,
       userId: userId,
@@ -49,8 +59,8 @@ export async function createFeedback(params: CreateFeedbackParams) {
       createdAt: new Date().toISOString(),
     };
 
+    // Update existing feedback or create new one
     let feedbackRef;
-
     if (feedbackId) {
       feedbackRef = db.collection("feedback").doc(feedbackId);
     } else {
@@ -58,7 +68,6 @@ export async function createFeedback(params: CreateFeedbackParams) {
     }
 
     await feedbackRef.set(feedback);
-
     return { success: true, feedbackId: feedbackRef.id };
   } catch (error) {
     console.error("Error saving feedback:", error);
@@ -66,17 +75,27 @@ export async function createFeedback(params: CreateFeedbackParams) {
   }
 }
 
+/**
+ * Retrieves a specific interview by its ID
+ * @param id Interview document ID
+ * @returns Interview data or null if not found
+ */
 export async function getInterviewById(id: string): Promise<Interview | null> {
   const interview = await db.collection("interviews").doc(id).get();
-
   return interview.data() as Interview | null;
 }
 
+/**
+ * Retrieves feedback for a specific interview and user
+ * @param params Object containing interviewId and userId
+ * @returns Feedback data or null if not found
+ */
 export async function getFeedbackByInterviewId(
   params: GetFeedbackByInterviewIdParams
 ): Promise<Feedback | null> {
   const { interviewId, userId } = params;
 
+  // Query feedback collection with compound filter
   const querySnapshot = await db
     .collection("feedback")
     .where("interviewId", "==", interviewId)
@@ -90,16 +109,22 @@ export async function getFeedbackByInterviewId(
   return { id: feedbackDoc.id, ...feedbackDoc.data() } as Feedback;
 }
 
+/**
+ * Gets the most recent interviews excluding the user's own
+ * @param params Object containing userId and optional limit
+ * @returns Array of interview data or null
+ */
 export async function getLatestInterviews(
   params: GetLatestInterviewsParams
 ): Promise<Interview[] | null> {
   const { userId, limit = 20 } = params;
 
+  // Query interviews with multiple conditions
   const interviews = await db
     .collection("interviews")
-    .orderBy("createdAt", "desc")
-    .where("finalized", "==", true)
-    .where("userId", "!=", userId)
+    .orderBy("createdAt", "desc")      // Most recent first
+    .where("finalized", "==", true)    // Only completed interviews
+    .where("userId", "!=", userId)     // Exclude user's own interviews
     .limit(limit)
     .get();
 
@@ -109,6 +134,11 @@ export async function getLatestInterviews(
   })) as Interview[];
 }
 
+/**
+ * Retrieves all interviews created by a specific user
+ * @param userId The ID of the user
+ * @returns Array of interview data or null
+ */
 export async function getInterviewsByUserId(
   userId: string
 ): Promise<Interview[] | null> {
