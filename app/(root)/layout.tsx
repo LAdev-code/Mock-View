@@ -1,3 +1,4 @@
+// Main layout for authenticated (root) pages, includes navigation and access control
 import Link from "next/link";
 import Image from "next/image";
 import { ReactNode } from "react";

@@ -1,3 +1,4 @@
+// shadcn/ui components configuration for style, aliases, and icon library
 {
   "$schema": "https://ui.shadcn.com/schema.json",
   "style": "new-york",

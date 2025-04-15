@@ -1,3 +1,4 @@
+// Main layout for the Next.js app, sets up font, metadata, and Toaster
 import { Toaster } from "sonner";
 import type { Metadata } from "next";
 import { Mona_Sans } from "next/font/google";
